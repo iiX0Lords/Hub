@@ -31,6 +31,7 @@ local toggles = {
     Lockon = {
         Toggled = false,
         Radius = 10,
+        Offset = 2,
     }
 }
 
@@ -127,6 +128,19 @@ lockOn:AddSlider({
 	end    
 })
 
+lockOn:AddSlider({
+	Name = "Offset",
+	Min = 0,
+	Max = 10,
+	Default = 2,
+	Color = Color3.fromRGB(0, 140, 255),
+	Increment = 1,
+	ValueName = "Studs",
+	Callback = function(Value)
+		toggles.Lockon.Offset = Value
+	end    
+})
+
 function findNearest()
     local maxDistance = toggles.Lockon.Radius
     local nearestPlayer, nearestDistance
@@ -148,21 +162,23 @@ end
 
 uis.InputBegan:Connect(function(input, gameProcessedEvent)
     if input.KeyCode == Enum.KeyCode.Q and not gameProcessedEvent then
-        task.spawn(function()
-            repeat
-                task.wait()
-                local nearest = findNearest()
-                if nearest ~= nil then
-                    plr.Character.Humanoid.AutoRotate = false
-                    nearest = nearest.Character
-                    local pos = plr.Character.HumanoidRootPart.Position
-                    local targetPos = nearest.HumanoidRootPart.Position
-                    local cf = CFrame.lookAt(pos, Vector3.new(targetPos.X, pos.Y, targetPos.Z))
-                    plr.Character.HumanoidRootPart.CFrame = cf
-                end
-            until not plr.Character.Info:FindFirstChild("InSkill")
-            plr.Character.Humanoid.AutoRotate = true
-        end)
+        if toggles.Lockon.Toggled then
+            task.spawn(function()
+                repeat
+                    task.wait()
+                    local nearest = findNearest()
+                    if nearest ~= nil then
+                        plr.Character.Humanoid.AutoRotate = false
+                        nearest = nearest.Character
+                        local pos = plr.Character.HumanoidRootPart.Position
+                        local targetPos = (nearest.HumanoidRootPart.CFrame * CFrame.new(0, 0, toggles.Lockon.Offset)).Position
+                        local cf = CFrame.lookAt(pos, Vector3.new(targetPos.X, pos.Y, targetPos.Z))
+                        plr.Character.HumanoidRootPart.CFrame = cf
+                    end
+                until not plr.Character.Info:FindFirstChild("InSkill")
+                plr.Character.Humanoid.AutoRotate = true
+            end)
+        end
     end
 end)
 
