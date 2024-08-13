@@ -27,6 +27,10 @@ local toggles = {
         ActivationDistance = 15,
         Delay = 100,
         LookAt = false,
+    },
+    Lockon = {
+        Toggled = false,
+        Radius = 10,
     }
 }
 
@@ -92,6 +96,75 @@ plr.CharacterAdded:Connect(function(character)
     handler(character)
 end)
 handler(plr.Character)
+
+--// Auto lockon
+
+local lockOn = Window:MakeTab({
+	Name = "Lock-On",
+	Icon = nil,
+	PremiumOnly = false
+})
+
+
+lockOn:AddToggle({
+    Name = "Toggle",
+    Default = false,
+    Callback = function(Value)
+        toggles.Lockon.Toggled = Value
+    end
+})
+
+lockOn:AddSlider({
+	Name = "Activation Distance",
+	Min = 5,
+	Max = 20,
+	Default = 10,
+	Color = Color3.fromRGB(0, 140, 255),
+	Increment = 1,
+	ValueName = "Studs",
+	Callback = function(Value)
+		toggles.Lockon.Radius = Value
+	end    
+})
+
+function findNearest()
+    local maxDistance = toggles.Lockon.Radius
+    local nearestPlayer, nearestDistance
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player == plr then continue end
+        local character = player.Character
+        local distance = player:DistanceFromCharacter(plr.Character.HumanoidRootPart.Position)
+        if not character or 
+            distance > maxDistance or
+            (nearestDistance and distance >= nearestDistance)
+        then
+            continue
+        end
+        nearestDistance = distance
+        nearestPlayer = player
+    end
+    return nearestPlayer
+end
+
+uis.InputBegan:Connect(function(input, gameProcessedEvent)
+    if input.KeyCode == Enum.KeyCode.Q and not gameProcessedEvent then
+        task.spawn(function()
+            repeat
+                task.wait()
+                local nearest = findNearest()
+                if nearest ~= nil then
+                    plr.Character.Humanoid.AutoRotate = false
+                    nearest = nearest.Character
+                    local pos = plr.Character.HumanoidRootPart.Position
+                    local targetPos = nearest.HumanoidRootPart.Position
+                    local cf = CFrame.lookAt(pos, Vector3.new(targetPos.X, pos.Y, targetPos.Z))
+                    plr.Character.HumanoidRootPart.CFrame = cf
+                end
+            until not plr.Character.Info:FindFirstChild("InSkill")
+            plr.Character.Humanoid.AutoRotate = true
+        end)
+    end
+end)
 
 --// Auto Dodge
 
