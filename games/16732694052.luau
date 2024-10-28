@@ -17,6 +17,7 @@ local toggles = {
     Autofishing = false,
     InstantCatch = false,
     Freeze = false,
+    InstantCollect = false,
 }
 
 local Window = Rayfield:CreateWindow({
@@ -54,7 +55,9 @@ function createToggle(parent, name, default, linked, callback)
     return toggle
 end
 
+
 local main = Window:CreateTab("Auto Fishing")
+local crabcagesW = Window:CreateTab("Crab Cages")
 
 local autoFishToggle = createToggle(main, "Auto Fish Toggle", false, "Autofishing", function(value)
     Rayfield:Notify{
@@ -165,3 +168,65 @@ shop:CreateButton({
         workspace.world.npcs.Merlin.Merlin.luck:InvokeServer()
     end
 })
+
+
+--crabcagesW:CreateLabel("Crab Cages")
+
+crabcagesW:CreateButton({
+    Name = "Place All",
+    Callback = function()
+
+        if plr.Character:FindFirstChild("Crab Cage") then
+            repeat
+                task.wait()
+                pcall(function()
+                    local ohTable1 = {
+                        ["CFrame"] = workspace.Camera:FindFirstChild("Cage").MeshPart.CFrame
+                    }
+                    workspace.iiX0Lord["Crab Cage"].Deploy:FireServer(ohTable1)
+                end)
+            until not plr.Character:FindFirstChild("Crab Cage")
+        end
+    end
+})
+local active : Folder = workspace.active
+local freezeToggle = createToggle(crabcagesW, "Instant Collect", false, "InstantCollect", function()
+    for _,child in pairs(active:GetChildren()) do
+        if child.Name == plr.Name then
+            if child:FindFirstChild("Cage") then
+                child:FindFirstChildOfClass("ProximityPrompt").HoldDuration = 0
+            end
+        end
+    end
+end)
+active.ChildAdded:Connect(function(child)
+    if toggles.InstantCollect then
+        if child.Name == plr.Name then
+            if child:FindFirstChild("Cage") then
+                child:FindFirstChildOfClass("ProximityPrompt").HoldDuration = 0
+            end
+        end
+    end
+end)
+
+
+if fireproximityprompt ~= nil then
+
+crabcagesW:CreateButton({
+    Name = "Collect All",
+    Callback = function()
+        for _,child in pairs(active:GetChildren()) do
+            if child.Name == plr.Name then
+                if child:FindFirstChild("Cage") then
+                    local prompt = child:FindFirstChildOfClass("ProximityPrompt")
+                    
+                    plr.Character.HumanoidRootPart.CFrame = child.Cage.cage.CFrame
+                    fireproximityprompt(prompt)
+
+                end
+            end
+        end
+    end
+})
+end
+
