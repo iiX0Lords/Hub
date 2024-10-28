@@ -230,3 +230,64 @@ crabcagesW:CreateButton({
 })
 end
 
+
+local teleprots = Window:CreateTab("Misc")
+
+teleprots:CreateToggle({
+    Name = "Drowning Enabled",
+    CurrentValue = true,
+    Callback = function(Value)
+        plr.Character:FindFirstChild("client"):FindFirstChild("oxygen").Enabled = Value
+    end
+})
+
+teleprots:CreateLabel("Teleports")
+
+local teleports = {
+    ["Moose Wood"] = CFrame.new(377.7, 134.5, 249.8),
+    ["Terrapin"] = CFrame.new(-165, 145.1, 1939.9),
+    ["Sunstone"] = {
+        ["Dock"] = CFrame.new(-928, 131, -1114),
+        ["Merlin"] = CFrame.new(-932, 223, -986),
+        ["Sundial Totem"] = CFrame.new(-1143, 134, -1070),
+    },
+    ["Roslit Bay"] = CFrame.new(-1470, 132, 696),
+    ["Statue Of Scat"] = CFrame.new(20, 159, -1043),
+    ["Mushgrove Swamp"] = CFrame.new(2441, 131, -690),
+    ["Snowscat Island"] = CFrame.new(2606, 135, 2402),
+    ["Desolate Deep"] = {
+        ["Shop"] = CFrame.new(-978, -244, -2702),
+        ["Main Cave/Shop"] = CFrame.new(-1654, -213, -2855),
+        ["Brine Pool"] = CFrame.new(-1797, -142, -3399),
+        ["Trident Temple"] = CFrame.new(-1477, -225, -2346),
+    },
+}
+
+
+for i,v in pairs(teleports) do
+    if typeof(v) == "CFrame" then
+        teleprots:CreateButton({
+            Name = i,
+            Callback = function()
+                plr.Character.HumanoidRootPart.CFrame = v
+            end
+        })
+    elseif typeof(v) == "table" then
+
+        local opss = {}
+
+        for i,v in pairs(v) do
+            table.insert(opss, i)
+        end
+        local drop = nil
+        drop = teleprots:CreateDropdown({
+            Name = i,
+            Options = opss,
+            CurrentOption = nil,
+            MultipleOptions = false,
+            Callback = function(Option)
+                plr.Character.HumanoidRootPart.CFrame = v[Option[1]]
+            end,
+         })
+    end
+end
