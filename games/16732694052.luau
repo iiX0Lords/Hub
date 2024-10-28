@@ -99,7 +99,11 @@ plr.PlayerGui.DescendantAdded:Connect(function(Descendant)
             progess = true
 
             if toggles.InstantCatch then
-                Descendant.Size = UDim2.new(0.5, 0, 1.3, 0)
+
+                delay(1,function()
+                    Descendant.Size = UDim2.new(0.5, 0, 1.3, 0)
+                end)
+
                 Descendant:GetPropertyChangedSignal('Position'):Wait()
                 game.ReplicatedStorage.events.reelfinished:FireServer(100, true)
             else
