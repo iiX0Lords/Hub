@@ -8,8 +8,3 @@ multiple_statements = "allow"
 unscoped_variables = "allow"
 deprecated = "allow"
 incorrect_standard_library_use = "allow"
-
-
-globals:
-    fireproximityprompt:
-        any: true
