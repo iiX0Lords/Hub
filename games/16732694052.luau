@@ -215,7 +215,7 @@ crabcagesW:CreateButton({
                     local ohTable1 = {
                         ["CFrame"] = workspace.Camera:FindFirstChild("Cage").MeshPart.CFrame
                     }
-                    workspace.iiX0Lord["Crab Cage"].Deploy:FireServer(ohTable1)
+                    plr.Character["Crab Cage"].Deploy:FireServer(ohTable1)
                 end)
                 print(success, response)
             until not plr.Character:FindFirstChild("Crab Cage")
