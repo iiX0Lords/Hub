@@ -157,6 +157,29 @@ local items = {
         CFrame = CFrame.new(476.3, 150.5, 231.9),
         Price = 45,
     },
+    ["Bait Crate"] = {
+        CFrame = CFrame.new(386.5, 137, 336.9),
+        Price = 120,
+    },
+    ["Quality Bait Crate"] = {
+        CFrame = CFrame.new(-174.9, 143.3, 1933.8),
+        Price = 525,
+    },
+}
+
+local totems = {
+    ["Sundial Totem"] = {
+        CFrame = CFrame.new(-1148.8, 134.5, -1073.7),
+        Price = 2000,
+    },
+    ["Tempest Totem"] = {
+        CFrame = CFrame.new(35.1, 132.5, 1943.1),
+        Price = 2000,
+    },
+    ["Smokescreen Totem"] = {
+        CFrame = CFrame.new(2791.1, 139.7, -627.4),
+        Price = 2000,
+    },
 }
 
 local prompt : PlayerGui = plr.PlayerGui:FindFirstChild("over")
@@ -166,9 +189,24 @@ function purchaseItem(item : string, itemPos : CFrame, amount : number)
     local originalCFrame = plr.Character.HumanoidRootPart.CFrame
 
     local count = 0
+    local shown = false
 
     callb = prompt.DescendantAdded:Connect(function(descendant)
         if descendant.Name == "confirm" then
+            shown = true
+
+            if count >= amount then
+                task.wait(0.01)
+                guiService.SelectedObject = descendant.Parent:FindFirstChild("deny")
+                virtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+                virtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+                task.wait(0.01)
+                guiService.SelectedObject = nil
+
+                callb:Disconnect()
+                plr.Character.HumanoidRootPart.CFrame = originalCFrame
+            end
+
             task.wait(0.01)
             guiService.SelectedObject = descendant
             virtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
@@ -186,12 +224,17 @@ function purchaseItem(item : string, itemPos : CFrame, amount : number)
     end)
 
     plr.Character.HumanoidRootPart.CFrame = itemPos
-    task.wait(.2)
     local model : Model = world:FindFirstChild("interactables"):WaitForChild(item)
     local proxprompt = model:FindFirstChildWhichIsA("ProximityPrompt",true)
 
+    repeat
+        task.wait()
+        proxprompt = model:FindFirstChildWhichIsA("ProximityPrompt",true)
+    until proxprompt ~= nil
+
     -- selene: allow(undefined_variable)
-    for i = 1,amount do
+
+    local function interact()
         if fireproximityprompt ~= nil then
             print("dddSS")
             fireproximityprompt(proxprompt)
@@ -203,9 +246,22 @@ function purchaseItem(item : string, itemPos : CFrame, amount : number)
             virtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
             virtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
         end
-        prompt.ChildRemoved:Wait()
     end
 
+    repeat
+        
+        if shown then break end
+
+        interact()
+        task.wait(0.1)
+    until shown == true
+
+    if amount > 1 then
+        for i = 1,(amount - 1) do
+            interact()
+            prompt.ChildRemoved:Wait()
+        end    
+    end
 end
 
 shop:CreateLabel("Purchases")
@@ -222,8 +278,24 @@ shop:CreateButton({
     end
 })
 
+shop:CreateLabel("Items")
 
 for name,index in pairs(items) do
+
+    shop:CreateInput({
+        Name = `{name} - {tostring(index.Price)}C$`,
+        PlaceholderText = "1",
+        RemoveTextAfterFocusLost = true,
+        Callback = function(txt)
+            local amount = tonumber(txt) or 1
+            purchaseItem(name, index.CFrame, amount)
+        end
+    })
+end
+
+shop:CreateLabel("Totems")
+
+for name,index in pairs(totems) do
 
     shop:CreateInput({
         Name = `{name} - {tostring(index.Price)}C$`,
