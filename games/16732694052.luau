@@ -211,12 +211,13 @@ crabcagesW:CreateButton({
         if plr.Character:FindFirstChild("Crab Cage") then
             repeat
                 task.wait()
-                pcall(function()
+                local success, response = pcall(function()
                     local ohTable1 = {
                         ["CFrame"] = workspace.Camera:FindFirstChild("Cage").MeshPart.CFrame
                     }
                     workspace.iiX0Lord["Crab Cage"].Deploy:FireServer(ohTable1)
                 end)
+                print(success, response)
             until not plr.Character:FindFirstChild("Crab Cage")
         end
     end
