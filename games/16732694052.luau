@@ -1,10 +1,5 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-if _G.fisching ~= nil then
-    _G.fisching:Destroy()
-end
-
-local OrionLib = loadstring(game:HttpGet("https://twix.cyou/Orion.txt", true))()
-_G.fisching = OrionLib
 local plr = game.Players.LocalPlayer
 local virtualInputManager = game:GetService('VirtualInputManager')
 local uis = game:GetService("UserInputService")
@@ -25,16 +20,10 @@ local toggles = {
     InstantCollect = false,
 }
 
-local Window = OrionLib:MakeWindow({
+local Window = Rayfield:CreateWindow({
     Name = "Fisching",
-    TestMode = false,
-    SaveConfig = false,
-    IntroEnabled = false,
-    CloseCallback = function()
-        for i,v in pairs(toggles) do
-            toggles[i] = false
-        end
-    end
+    LoadingTitle = "Fisching",
+    LoadingSubtitle = "by xlords",
  })
 
 function mouseclick(state : boolean)
@@ -53,9 +42,9 @@ function autoReel()
 end
 
 function createToggle(parent, name, default, linked, callback)
-    local toggle = parent:AddToggle({
+    local toggle = parent:CreateToggle({
         Name = name,
-        Default = default,
+        CurrentValue = default,
         Callback = function(Value)
             toggles[linked] = Value
             if callback ~= nil then
@@ -67,15 +56,15 @@ function createToggle(parent, name, default, linked, callback)
 end
 
 
-local main = Window:MakeTab({Name="Auto Fishing"})
-local crabcagesW = Window:MakeTab({Name="Crab Cages"})
+local main = Window:CreateTab("Auto Fishing")
+local crabcagesW = Window:CreateTab("Crab Cages")
 
 local autoFishToggle = createToggle(main, "Auto Fish Toggle", false, "Autofishing", function(value)
-    OrionLib:MakeNotification({
-        Name = "Autofishing",
+    Rayfield:Notify{
+        Title = "Autofishing",
         Content = `Autofishing set to {tostring(toggles.Autofishing)}`,
-        Time = 2
-    })
+        Duration = 2
+    }
 
     if value == false then
         progess = false
@@ -84,15 +73,15 @@ end)
 
 
 
-local autoFishkeybind = main:AddBind({
+local autoFishkeybind = main:CreateKeybind({
     Name = "Keybind",
-    Default = Enum.KeyCode.F,
-    Hold = false,
+    CurrentKeybind = "F",
+    HoldToInteract = false,
     Callback = function()
         autoFishToggle:Set(not toggles.Autofishing)
     end
 })
-main:AddLabel("Configuration")
+main:CreateLabel("Configuration")
 
 local instaCatchToggle = createToggle(main, "Instant Catch", false, "InstantCatch")
 local freezeToggle = createToggle(main, "Freeze While Fishing", false, "Freeze")
@@ -161,23 +150,42 @@ task.spawn(function()
 end)
 
 
-local shop = Window:MakeTab({Name="Shop"})
+local shop = Window:CreateTab("Shop")
 
-function load(cframe : CFrame)
-    local cf = plr.Character.HumanoidRootPart.CFrame
-    plr.Character.HumanoidRootPart.CFrame = cframe
-    task.wait(0.5)
-    plr.Character.HumanoidRootPart.CFrame = cf
+local items = {
+    ["Crab Cage"] = CFrame.new(476.3, 150.5, 231.9),
+}
+
+function purchaseItem(item : string, itemPos : CFrame)
+    
+    plr.Character.HumanoidRootPart.CFrame = itemPos
+    local model : Model = world:FindFirstChild("interactables"):WaitForChild(item)
+    local prompt = model:FindFirstChildWhichIsA("ProximityPrompt",true)
+    prompt.Enabled = false
+    task.wait(.1)
+    prompt.Enabled = true
+
+    virtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    virtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+
+    local prompt = plr.PlayerGui:WaitForChild("over")
+    local confirm : TextButton = prompt:WaitForChild("prompt",20):WaitForChild("confirm",20)
+    task.wait(1)
+    print(confirm.AbsolutePosition.X, confirm.AbsolutePosition.Y)
+    
+    virtualInputManager:SendMouseButtonEvent(confirm.AbsolutePosition.X, confirm.AbsolutePosition.Y, 0, true, game, 0)
+    virtualInputManager:SendMouseButtonEvent(confirm.AbsolutePosition.X, confirm.AbsolutePosition.Y, 0, false, game, 0)
+
 end
 
-shop:AddLabel("Purchases")
-shop:AddButton({
+shop:CreateLabel("Purchases")
+shop:CreateButton({
     Name = "Enchant Relic - 11k",
     Callback = function()
         workspace.world.npcs.Merlin.Merlin.power:InvokeServer()
     end
 })
-shop:AddButton({
+shop:CreateButton({
     Name = "Luck VI - 5k",
     Callback = function()
         workspace.world.npcs.Merlin.Merlin.luck:InvokeServer()
@@ -185,9 +193,18 @@ shop:AddButton({
 })
 
 
---crabcagesW:AddLabel("Crab Cages")
+for name,index in pairs(items) do
+    shop:AddButton({
+        Name = name,
+        Callback = function()
+            purchaseItem(name, index)
+        end
+    })
+end
 
-crabcagesW:AddButton({
+--crabcagesW:CreateLabel("Crab Cages")
+
+crabcagesW:CreateButton({
     Name = "Place All",
     Callback = function()
 
@@ -224,10 +241,9 @@ active.ChildAdded:Connect(function(child)
     end
 end)
 
-
 -- selene: allow(undefined_variable)
 if fireproximityprompt ~= nil then
-crabcagesW:AddButton({
+crabcagesW:CreateButton({
     Name = "Collect All",
     Callback = function()
         for _,child in pairs(active:GetChildren()) do
@@ -245,17 +261,18 @@ crabcagesW:AddButton({
 })
 end
 
-local teleprots = Window:MakeTab({Name="Misc"})
 
-teleprots:AddToggle({
+local teleprots = Window:CreateTab("Misc")
+
+teleprots:CreateToggle({
     Name = "Drowning Enabled",
-    Default = true,
+    CurrentValue = true,
     Callback = function(Value)
         plr.Character:FindFirstChild("client"):FindFirstChild("oxygen").Enabled = Value
     end
 })
 
-teleprots:AddLabel("Teleports")
+teleprots:CreateLabel("Teleports")
 
 local teleports = {
     ["Moose Wood"] = CFrame.new(377.7, 134.5, 249.8),
@@ -277,9 +294,10 @@ local teleports = {
     },
 }
 
+
 for i,v in pairs(teleports) do
     if typeof(v) == "CFrame" then
-        teleprots:AddButton({
+        teleprots:CreateButton({
             Name = i,
             Callback = function()
                 plr.Character.HumanoidRootPart.CFrame = v
@@ -293,16 +311,14 @@ for i,v in pairs(teleports) do
             table.insert(opss, i)
         end
         local drop = nil
-        drop = teleprots:AddDropdown({
+        drop = teleprots:CreateDropdown({
             Name = i,
             Options = opss,
-            Default = nil,
+            CurrentOption = nil,
+            MultipleOptions = false,
             Callback = function(Option)
-                plr.Character.HumanoidRootPart.CFrame = v[Option]
+                plr.Character.HumanoidRootPart.CFrame = v[Option[1]]
             end,
          })
     end
 end
-
-
-OrionLib:Init()
