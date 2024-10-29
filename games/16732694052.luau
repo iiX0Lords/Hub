@@ -153,28 +153,58 @@ end)
 local shop = Window:CreateTab("Shop")
 
 local items = {
-    ["Crab Cage"] = CFrame.new(476.3, 150.5, 231.9),
+    ["Crab Cage"] = {
+        CFrame = CFrame.new(476.3, 150.5, 231.9),
+        Price = 45,
+    },
 }
 
-function purchaseItem(item : string, itemPos : CFrame)
-    
+local prompt : PlayerGui = plr.PlayerGui:FindFirstChild("over")
+
+function purchaseItem(item : string, itemPos : CFrame, amount : number)
+    local callb = nil
+    local originalCFrame = plr.Character.HumanoidRootPart.CFrame
+
+    local count = 0
+
+    callb = prompt.DescendantAdded:Connect(function(descendant)
+        if descendant.Name == "confirm" then
+            task.wait(0.01)
+            guiService.SelectedObject = descendant
+            virtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+            virtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+            task.wait(0.01)
+            guiService.SelectedObject = nil
+            count += 1
+
+            if count >= amount then
+                callb:Disconnect()
+                plr.Character.HumanoidRootPart.CFrame = originalCFrame
+            end
+            
+        end
+    end)
+
     plr.Character.HumanoidRootPart.CFrame = itemPos
+    task.wait(.2)
     local model : Model = world:FindFirstChild("interactables"):WaitForChild(item)
-    local prompt = model:FindFirstChildWhichIsA("ProximityPrompt",true)
-    prompt.Enabled = false
-    task.wait(.1)
-    prompt.Enabled = true
+    local proxprompt = model:FindFirstChildWhichIsA("ProximityPrompt",true)
 
-    virtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-    virtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-
-    local prompt = plr.PlayerGui:WaitForChild("over")
-    local confirm : TextButton = prompt:WaitForChild("prompt",20):WaitForChild("confirm",20)
-    task.wait(1)
-    print(confirm.AbsolutePosition.X, confirm.AbsolutePosition.Y)
-    
-    virtualInputManager:SendMouseButtonEvent(confirm.AbsolutePosition.X, confirm.AbsolutePosition.Y, 0, true, game, 0)
-    virtualInputManager:SendMouseButtonEvent(confirm.AbsolutePosition.X, confirm.AbsolutePosition.Y, 0, false, game, 0)
+    -- selene: allow(undefined_variable)
+    for i = 1,amount do
+        if fireproximityprompt ~= nil then
+            print("dddSS")
+            fireproximityprompt(proxprompt)
+            else
+            proxprompt.Enabled = false
+            task.wait(0.2)
+            proxprompt.Enabled = true
+        
+            virtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+            virtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        end
+        prompt.ChildRemoved:Wait()
+    end
 
 end
 
@@ -194,10 +224,14 @@ shop:CreateButton({
 
 
 for name,index in pairs(items) do
-    shop:CreateButton({
-        Name = name,
-        Callback = function()
-            purchaseItem(name, index)
+
+    shop:CreateInput({
+        Name = `{name} - {tostring(index.Price)}C$`,
+        PlaceholderText = "1",
+        RemoveTextAfterFocusLost = true,
+        Callback = function(txt)
+            local amount = tonumber(txt) or 1
+            purchaseItem(name, index.CFrame, amount)
         end
     })
 end
