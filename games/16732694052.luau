@@ -194,7 +194,7 @@ shop:CreateButton({
 
 
 for name,index in pairs(items) do
-    shop:AddButton({
+    shop:CreateButton({
         Name = name,
         Callback = function()
             purchaseItem(name, index)
