@@ -22,6 +22,7 @@ local toggles = {
     ClickTP = true
 }
 
+local thresshold = 0.97
 
 local teleports = {
     ["Moosewood"] = CFrame.new(377.7, 134.5, 249.8),
@@ -64,7 +65,7 @@ function autoReel()
     local bar : Frame = power.powerbar:FindFirstChild("bar")
     repeat
         task.wait()
-    until bar.Size.Y.Scale >= 0.97
+    until bar.Size.Y.Scale >= thresshold
     mouseclick(false)
 end
 
@@ -112,6 +113,17 @@ main:CreateLabel("Configuration")
 
 local instaCatchToggle = createToggle(main, "Instant Catch", false, "InstantCatch")
 local freezeToggle = createToggle(main, "Freeze While Fishing", false, "Freeze")
+
+main:CreateSlider({
+    Name = "Auto reel threshold",
+    Range = {0, 1},
+    Increment = 0.01,
+    Suffix = "Height",
+    CurrentValue = 0.97,
+    Callback = function(Value)
+        thresshold = Value
+    end,
+})
 
 plr.PlayerGui.DescendantAdded:Connect(function(Descendant)
     if toggles.Autofishing then
