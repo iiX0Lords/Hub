@@ -428,7 +428,10 @@ local teleports = {
         ["Sundial Totem"] = CFrame.new(-1143, 134, -1070),
     },
     ["Roslit Bay"] = CFrame.new(-1470, 132, 696),
-    ["Statue Of Scat"] = CFrame.new(20, 159, -1043),
+    ["Statue Of Scat"] = {
+        ["Entrance"] = CFrame.new(20, 159, -1043),
+        ["Enchanting Alter"] = CFrame.new(1307.9, -805.3, -121.4),
+    },
     ["Mushgrove Swamp"] = CFrame.new(2441, 131, -690),
     ["Snowscat Island"] = CFrame.new(2606, 135, 2402),
     ["Desolate Deep"] = {
