@@ -274,17 +274,45 @@ end
 
 shop:CreateLabel("Purchases")
 
---#TODO MAKE WORK IDIOT
-shop:CreateButton({
+function merlinBuy(purchase : string, amount : number)
+
+    local original : CFrame = plr.Character.HumanoidRootPart.CFrame
+
+    plr.Character.HumanoidRootPart.CFrame = CFrame.new(-932, 223, -986)
+    task.wait(0.5)
+    plr.Character.HumanoidRootPart.CFrame = CFrame.new(-932.5, 22.9, -991.6)
+    task.wait(0.2)
+
+    for i = 1,amount do
+        workspace.world.npcs.Merlin.Merlin:FindFirstChild(purchase):InvokeServer()
+    end
+
+    virtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    virtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+
+    task.wait(0.3)
+    plr.Character.HumanoidRootPart.CFrame = original
+end
+
+shop:CreateInput({
     Name = "Enchant Relic - 11k",
-    Callback = function()
-        workspace.world.npcs.Merlin.Merlin.power:InvokeServer()
+    PlaceholderText = "1",
+    RemoveTextAfterFocusLost = true,
+    Callback = function(txt)
+        local amount = tonumber(txt)
+        if amount == nil then return end
+        merlinBuy("power", amount)
     end
 })
-shop:CreateButton({
+
+shop:CreateInput({
     Name = "Luck VI - 5k",
-    Callback = function()
-        workspace.world.npcs.Merlin.Merlin.luck:InvokeServer()
+    PlaceholderText = "1",
+    RemoveTextAfterFocusLost = true,
+    Callback = function(txt)
+        local amount = tonumber(txt)
+        if amount == nil then return end
+        merlinBuy("luck", amount)
     end
 })
 
