@@ -295,7 +295,7 @@ function merlinBuy(purchase : string, amount : number)
 end
 
 shop:CreateInput({
-    Name = "Enchant Relic - 11k",
+    Name = "Enchant Relic - 11,000C$",
     PlaceholderText = "1",
     RemoveTextAfterFocusLost = true,
     Callback = function(txt)
@@ -306,7 +306,7 @@ shop:CreateInput({
 })
 
 shop:CreateInput({
-    Name = "Luck VI - 5k",
+    Name = "Luck VI - 5,000C$",
     PlaceholderText = "1",
     RemoveTextAfterFocusLost = true,
     Callback = function(txt)
