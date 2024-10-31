@@ -10,6 +10,7 @@ local guiService = game:GetService('GuiService')
 
 local world = workspace.world
 local map = world.map
+local active : Folder = workspace.active
 
 local progess = false
 
@@ -18,7 +19,33 @@ local toggles = {
     InstantCatch = false,
     Freeze = false,
     InstantCollect = false,
+    ClickTP = true
 }
+
+
+local teleports = {
+    ["Moosewood"] = CFrame.new(377.7, 134.5, 249.8),
+    ["Terrapin Island"] = CFrame.new(-165, 145.1, 1939.9),
+    ["Sunstone Island"] = {
+        ["Main Dock"] = CFrame.new(-928, 131, -1114),
+        ["Merlin"] = CFrame.new(-932, 223, -986),
+        ["Sundial Totem"] = CFrame.new(-1143, 134, -1070),
+    },
+    ["Roslit Bay"] = CFrame.new(-1470, 132, 696),
+    ["Statue Of Sovereignty"] = {
+        ["Main Entrance"] = CFrame.new(20, 159, -1043),
+        ["Enchanting Alter"] = CFrame.new(1307.9, -805.3, -121.4),
+    },
+    ["Mushgrove"] = CFrame.new(2441, 131, -690),
+    ["Snowcap Island"] = CFrame.new(2606, 135, 2402),
+    ["Desolate Deep"] = {
+        ["Shop"] = CFrame.new(-978, -244, -2702),
+        ["Main Cave/Shop"] = CFrame.new(-1654, -213, -2855),
+        ["Brine Pool"] = CFrame.new(-1797, -142, -3399),
+        ["Trident Temple"] = CFrame.new(-1477, -225, -2346),
+    },
+}
+
 
 local Window = Rayfield:CreateWindow({
     Name = "Fisching",
@@ -366,7 +393,7 @@ crabcagesW:CreateButton({
         end
     end
 })
-local active : Folder = workspace.active
+
 local freezeToggle = createToggle(crabcagesW, "Instant Collect", false, "InstantCollect", function()
     for _,child in pairs(active:GetChildren()) do
         if child.Name == plr.Name then
@@ -417,31 +444,99 @@ teleprots:CreateToggle({
     end
 })
 
+local pois = active:FindFirstChild("OceanPOI's")
+local zones : Model = workspace.zones.fishing
+teleprots:CreateToggle({
+    Name = "Click Island Text To TP",
+    CurrentValue = true,
+    Callback = function(Value)
+        for i,v in pairs(plr.PlayerGui:GetChildren()) do
+            if v:IsA("BillboardGui") then
+                if v:FindFirstChild(v.Name) then
+                    v.Enabled = Value
+                end
+            end
+        end
+    end
+})
+
+function doteleport(to : CFrame)
+    if plr.Character.Humanoid.SeatPart ~= nil then
+        plr.Character.Humanoid.SeatPart.Parent.Base.CFrame = to
+        else
+        plr.Character.HumanoidRootPart.CFrame = to
+    end
+end
+
+function poiHeaderClicked(header : BillboardGui, isIsland)
+    if not isIsland then
+        doteleport(header.Parent.CFrame)
+        else
+        if teleports[header.Parent.Name] then
+            if typeof(teleports[header.Parent.Name]) == "CFrame" then
+                doteleport(teleports[header.Parent.Name])
+                else
+                for i,v in pairs(teleports[header.Parent.Name]) do
+                    if string.find(i, "Main") then
+                        doteleport(v)
+                        break
+                    end
+                end
+            end
+            
+        end
+    end
+end
+
+function prepareHeader(header : BillboardGui, isIsland)
+    local title : TextLabel = header:FindFirstChild("title")
+    if title == nil then warn("no header"..header.Parent.Name) return end
+    if plr.PlayerGui:FindFirstChild(header.Parent.Name) then plr.PlayerGui:FindFirstChild(header.Parent.Name):Destroy() end
+    local p = header:Clone()
+    p.Name = header.Parent.Name
+    p.Parent = plr.PlayerGui
+    p:ClearAllChildren()
+    p.Adornee = header.Parent
+    local btn = Instance.new("TextButton",p)
+    btn.Name = header.Parent.Name
+    btn.AnchorPoint = title.AnchorPoint
+    btn.Size = title.Size
+    btn.Position = title.Position
+    btn.BackgroundTransparency = 1
+    btn.TextTransparency = 1
+    btn.ZIndex = 2
+
+    header:GetPropertyChangedSignal("Enabled"):Connect(function()
+        if p ~= nil then
+            p.Enabled = header.Enabled
+        end
+    end)
+
+
+    btn.MouseButton1Click:Connect(function()
+        poiHeaderClicked(header, isIsland)
+    end)
+end
+
+for i,v in pairs(pois:GetChildren()) do
+    if v:FindFirstChild("POIHeader") then
+        prepareHeader(v:FindFirstChild("POIHeader"), true)
+    end
+end
+
+for i,descendant in pairs(zones:GetDescendants()) do
+    if descendant.Name == "POIHeader" then
+        prepareHeader(descendant)
+    end
+end
+
+zones.DescendantAdded:Connect(function(descendant)
+    if descendant.Name == "POIHeader" then
+        prepareHeader(descendant)
+    end
+end)
+
 teleprots:CreateLabel("Teleports")
-
-local teleports = {
-    ["Moose Wood"] = CFrame.new(377.7, 134.5, 249.8),
-    ["Terrapin"] = CFrame.new(-165, 145.1, 1939.9),
-    ["Sunstone"] = {
-        ["Dock"] = CFrame.new(-928, 131, -1114),
-        ["Merlin"] = CFrame.new(-932, 223, -986),
-        ["Sundial Totem"] = CFrame.new(-1143, 134, -1070),
-    },
-    ["Roslit Bay"] = CFrame.new(-1470, 132, 696),
-    ["Statue Of Scat"] = {
-        ["Entrance"] = CFrame.new(20, 159, -1043),
-        ["Enchanting Alter"] = CFrame.new(1307.9, -805.3, -121.4),
-    },
-    ["Mushgrove Swamp"] = CFrame.new(2441, 131, -690),
-    ["Snowscat Island"] = CFrame.new(2606, 135, 2402),
-    ["Desolate Deep"] = {
-        ["Shop"] = CFrame.new(-978, -244, -2702),
-        ["Main Cave/Shop"] = CFrame.new(-1654, -213, -2855),
-        ["Brine Pool"] = CFrame.new(-1797, -142, -3399),
-        ["Trident Temple"] = CFrame.new(-1477, -225, -2346),
-    },
-}
-
 
 for i,v in pairs(teleports) do
     if typeof(v) == "CFrame" then
