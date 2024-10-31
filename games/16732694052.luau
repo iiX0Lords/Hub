@@ -128,16 +128,24 @@ task.spawn(function()
         if tool ~= nil then
             if tool.Name:find("Rod") then
                 if toggles.Autofishing and not progess then
-                    
                     if toggles.Freeze then
-                        plr.Character.HumanoidRootPart.Anchored = true
+
+                        local velocity = Instance.new("BodyVelocity")
+                        velocity.Name = "Freeze"
+                        velocity.Parent = plr.Character.HumanoidRootPart
+                        velocity.MaxForce = Vector3.new(999999,999999,999999)
+                        velocity.Velocity = Vector3.new(0,0,0)
                     end
 
                     autoReel()
                     repeat
                         task.wait()
                     until progess == false
-                    plr.Character.HumanoidRootPart.Anchored = false
+                    
+                    if plr.Character.HumanoidRootPart:FindFirstChild("Freeze") then
+                        plr.Character.HumanoidRootPart:FindFirstChild("Freeze"):Destroy()
+                    end
+
                 end
                 else
                 progess = false
@@ -206,7 +214,7 @@ function purchaseItem(item : string, itemPos : CFrame, amount : number)
                 callb:Disconnect()
                 plr.Character.HumanoidRootPart.CFrame = originalCFrame
             end
-
+            -- dont ask im pulling these waits out of my ass
             task.wait(0.01)
             guiService.SelectedObject = descendant
             virtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
@@ -265,6 +273,8 @@ function purchaseItem(item : string, itemPos : CFrame, amount : number)
 end
 
 shop:CreateLabel("Purchases")
+
+--#TODO MAKE WORK IDIOT
 shop:CreateButton({
     Name = "Enchant Relic - 11k",
     Callback = function()
