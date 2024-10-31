@@ -272,8 +272,6 @@ function purchaseItem(item : string, itemPos : CFrame, amount : number)
     end
 end
 
-shop:CreateLabel("Purchases")
-
 function merlinBuy(purchase : string, amount : number)
 
     local original : CFrame = plr.Character.HumanoidRootPart.CFrame
@@ -294,28 +292,6 @@ function merlinBuy(purchase : string, amount : number)
     plr.Character.HumanoidRootPart.CFrame = original
 end
 
-shop:CreateInput({
-    Name = "Enchant Relic - 11,000C$",
-    PlaceholderText = "1",
-    RemoveTextAfterFocusLost = true,
-    Callback = function(txt)
-        local amount = tonumber(txt)
-        if amount == nil then return end
-        merlinBuy("power", amount)
-    end
-})
-
-shop:CreateInput({
-    Name = "Luck VI - 5,000C$",
-    PlaceholderText = "1",
-    RemoveTextAfterFocusLost = true,
-    Callback = function(txt)
-        local amount = tonumber(txt)
-        if amount == nil then return end
-        merlinBuy("luck", amount)
-    end
-})
-
 shop:CreateLabel("Items")
 
 for name,index in pairs(items) do
@@ -331,6 +307,17 @@ for name,index in pairs(items) do
     })
 end
 
+shop:CreateInput({
+    Name = "Enchant Relic - 11,000C$",
+    PlaceholderText = "1",
+    RemoveTextAfterFocusLost = true,
+    Callback = function(txt)
+        local amount = tonumber(txt)
+        if amount == nil then return end
+        merlinBuy("power", amount)
+    end
+})
+
 shop:CreateLabel("Totems")
 
 for name,index in pairs(totems) do
@@ -345,6 +332,19 @@ for name,index in pairs(totems) do
         end
     })
 end
+
+shop:CreateLabel("Modifiers")
+shop:CreateInput({
+    Name = "Luck VI - 5,000C$",
+    PlaceholderText = "1",
+    RemoveTextAfterFocusLost = true,
+    Callback = function(txt)
+        local amount = tonumber(txt)
+        if amount == nil then return end
+        merlinBuy("luck", amount)
+    end
+})
+
 
 --crabcagesW:CreateLabel("Crab Cages")
 
