@@ -129,6 +129,9 @@ plr.PlayerGui.DescendantAdded:Connect(function(Descendant)
     if toggles.Autofishing then
         if Descendant.Name == 'button' and Descendant.Parent.Name == 'safezone' then
             task.wait(0.01)
+            Descendant.Selectable = true
+            Descendant.Visible = true
+            Descendant.Parent.Visible = true
             guiService.SelectedObject = Descendant
             virtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
             virtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
