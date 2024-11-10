@@ -396,7 +396,7 @@ crabcagesW:CreateButton({
 
         if plr.Character:FindFirstChild("Crab Cage") then
             repeat
-                task.wait()
+                task.wait(0.1)
                 local success, response = pcall(function()
                     local ohTable1 = {
                         ["CFrame"] = workspace.Camera:FindFirstChild("Cage").MeshPart.CFrame
