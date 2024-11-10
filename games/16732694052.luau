@@ -390,6 +390,7 @@ shop:CreateInput({
 
 --crabcagesW:CreateLabel("Crab Cages")
 
+--#TODO fix the lag when placing to many
 crabcagesW:CreateButton({
     Name = "Place All",
     Callback = function()
