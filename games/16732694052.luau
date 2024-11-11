@@ -1,3 +1,9 @@
+
+local identifier = Instance.new("Configuration")
+identifier.Name = "Fisching"
+identifier.Parent = game.Players.LocalPlayer
+game:GetService("Debris"):AddItem(identifier,1)
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local plr = game.Players.LocalPlayer
@@ -13,7 +19,7 @@ local map = world.map
 local active : Folder = workspace.active
 
 local progess = false
-
+local destroyed = false
 
 local toggles = {
     Autofishing = false,
@@ -128,7 +134,7 @@ main:CreateSlider({
 })
 
 plr.PlayerGui.DescendantAdded:Connect(function(Descendant)
-    if toggles.Autofishing then
+    if toggles.Autofishing and not destroyed then
         if Descendant.Name == 'button' and Descendant.Parent.Name == 'safezone' then
             task.wait(0.01)
             Descendant.Selectable = true
@@ -168,6 +174,11 @@ end)
 
 task.spawn(function()
     while task.wait() do
+
+        if destroyed then
+            break
+        end
+
         local tool = plr.Character:FindFirstChildOfClass("Tool")
         if tool ~= nil then
             if tool.Name:find("Rod") then
@@ -583,3 +594,15 @@ for i,v in pairs(teleports) do
          })
     end
 end
+
+
+plr.ChildAdded:Connect(function(child)
+    if child.Name == "Fisching" then
+        print("Loaded gui again")
+        destroyed = true
+        for i,v in pairs(toggles) do
+            toggles[i] = false
+        end
+        Rayfield:Destroy()
+    end
+end)
