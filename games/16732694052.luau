@@ -14,6 +14,7 @@ local active : Folder = workspace.active
 
 local progess = false
 
+
 local toggles = {
     Autofishing = false,
     InstantCatch = false,
@@ -45,6 +46,7 @@ local teleports = {
         ["Brine Pool"] = CFrame.new(-1797, -142, -3399),
         ["Trident Temple"] = CFrame.new(-1477, -225, -2346),
     },
+    ["Forsaken Shores"] = CFrame.new(-2498, 132, 1543),
 }
 
 
