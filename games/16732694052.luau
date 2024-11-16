@@ -29,6 +29,11 @@ local toggles = {
     ClickTP = true
 }
 
+local values = {
+    casted = Instance.new("ObjectValue"),
+    bite = Instance.new("ObjectValue"),
+}
+
 local thresshold = 0.97
 
 local teleports = {
@@ -55,9 +60,10 @@ local teleports = {
     ["Forsaken Shores"] = CFrame.new(-2498, 132, 1543),
 }
 
-
+local version = "<!#FV> 1.4.3 </#FV>"
+version = string.sub(version,8,13)
 local Window = Rayfield:CreateWindow({
-    Name = "Fisching",
+    Name = `Fisching Version | {version}`,
     LoadingTitle = "Fisching",
     LoadingSubtitle = "by xlords",
  })
@@ -104,6 +110,8 @@ local autoFishToggle = createToggle(main, "Auto Fish Toggle", false, "Autofishin
 
     if value == false then
         progess = false
+        else
+        autoReel()
     end
 end)
 
@@ -172,46 +180,89 @@ plr.PlayerGui.DescendantRemoving:Connect(function(Descendant)
     end
 end)
 
-task.spawn(function()
-    while task.wait() do
+-- task.spawn(function()
+--     while task.wait() do
 
-        if destroyed then
-            break
-        end
+--         if destroyed then
+--             break
+--         end
 
-        local tool = plr.Character:FindFirstChildOfClass("Tool")
-        if tool ~= nil then
-            if tool.Name:find("Rod") then
-                if toggles.Autofishing and not progess then
-                    if toggles.Freeze then
+--         local tool = plr.Character:FindFirstChildOfClass("Tool")
+--         if tool ~= nil then
+--             if tool.Name:find("Rod") then
+--                 if toggles.Autofishing then
+--                     if not progess then
+--                         if toggles.Freeze then
 
-                        local velocity = Instance.new("BodyVelocity")
-                        velocity.Name = "Freeze"
-                        velocity.Parent = plr.Character.HumanoidRootPart
-                        velocity.MaxForce = Vector3.new(999999,999999,999999)
-                        velocity.Velocity = Vector3.new(0,0,0)
-                    end
+--                             local velocity = Instance.new("BodyVelocity")
+--                             velocity.Name = "Freeze"
+--                             velocity.Parent = plr.Character.HumanoidRootPart
+--                             velocity.MaxForce = Vector3.new(999999,999999,999999)
+--                             velocity.Velocity = Vector3.new(0,0,0)
+--                         end
 
-                    autoReel()
-                    repeat
-                        task.wait()
-                    until progess == false
-                    
-                    if plr.Character.HumanoidRootPart:FindFirstChild("Freeze") then
-                        plr.Character.HumanoidRootPart:FindFirstChild("Freeze"):Destroy()
-                    end
-
-                end
-                else
-                progess = false
-            end
-            else
-            progess = false
-        end
+--                         autoReel()
+--                         repeat
+--                             task.wait()
+--                         until progess == false
+                        
+--                         if plr.Character.HumanoidRootPart:FindFirstChild("Freeze") then
+--                             plr.Character.HumanoidRootPart:FindFirstChild("Freeze"):Destroy()
+--                         end
+--                     end
+--                 end
+--                 else
+--                 progess = false
+--             end
+--             else
+--             progess = false
+--         end
         
-    end
-end)
+--     end
+-- end)
 
+castConnection = nil
+biteConnection = nil
+
+function castedChange(value)
+    if value == false and toggles.Autofishing then
+        task.wait(0.5)
+        autoReel()
+    end
+end
+
+function childRemovedFunc(child)
+    if destroyed then
+        if castConnection ~= nil then
+            castConnection:Disconnect()
+        end
+        return
+    end
+    wait()
+    if child.Parent == plr.Character then
+        local tool = plr.Character:FindFirstChildOfClass("Tool")
+        if tool == nil then return end
+        if tool.Name:find("Rod") then
+            
+            local values = tool:FindFirstChild("values")
+            local bite : BoolValue,casted : BoolValue = values:FindFirstChild("bite"), values:FindFirstChild("casted")
+
+            if castConnection ~= nil then
+                castConnection:Disconnect()
+                print(`Disconnected from {tool.Name}`)
+            end
+
+            castConnection = casted.Changed:Connect(castedChange)
+            print(`Connceted to {tool.Name}`)
+        end
+    end
+end
+
+plr.Backpack.ChildRemoved:Connect(childRemovedFunc)
+
+if plr.Character:FindFirstChildOfClass("Tool") then
+    childRemovedFunc(plr.Character:FindFirstChildOfClass("Tool"))
+end
 
 local shop = Window:CreateTab("Shop")
 
