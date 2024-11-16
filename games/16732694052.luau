@@ -63,7 +63,7 @@ local teleports = {
 local version = "<!#FV> 1.4.3 </#FV>"
 version = string.sub(version,8,13)
 local Window = Rayfield:CreateWindow({
-    Name = `Fisching Version | {version}`,
+    Name = `Fisching | {version}`,
     LoadingTitle = "Fisching",
     LoadingSubtitle = "by xlords",
  })
