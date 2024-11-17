@@ -4,7 +4,7 @@ identifier.Name = "Fisching"
 identifier.Parent = game.Players.LocalPlayer
 game:GetService("Debris"):AddItem(identifier,1)
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 
 local plr = game.Players.LocalPlayer
 local virtualInputManager = game:GetService('VirtualInputManager')
@@ -61,13 +61,19 @@ local teleports = {
     ["The Depths"] = CFrame.new(947.5, -711.7, 1243.2),
 }
 
-local version = "<!#FV> 1.5.3 </#FV>"
+local version = "<!#FV> 1.6.3 </#FV>"
 version = string.sub(version,8,13)
-local Window = Rayfield:CreateWindow({
-    Name = `Fisching | {version}`,
-    LoadingTitle = "Fisching",
-    LoadingSubtitle = "by xlords",
+local Window = Fluent:CreateWindow({
+    Title = `Fisching | {version}`,
+    SubTitle = "by xlords",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = false,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.K
  })
+ Fluent:ToggleTransparency(false)
+ local Options = Fluent.Options
 
 function mouseclick(state : boolean)
     virtualInputManager:SendMouseButtonEvent(0, 0, 0, state, game, 0)
@@ -85,9 +91,9 @@ function autoReel()
 end
 
 function createToggle(parent, name, default, linked, callback)
-    local toggle = parent:CreateToggle({
-        Name = name,
-        CurrentValue = default,
+    local toggle = parent:AddToggle(name,{
+        Title = name,
+        Default = default,
         Callback = function(Value)
             toggles[linked] = Value
             if callback ~= nil then
@@ -95,15 +101,23 @@ function createToggle(parent, name, default, linked, callback)
             end
         end
     })
+
+    -- toggle:OnChanged(function()
+    --     local Value = Options[name].Value
+    --     toggles[linked] = Value
+    --     if callback ~= nil then
+    --         callback(Value)
+    --     end
+    -- end)
     return toggle
 end
 
 
-local main = Window:CreateTab("Auto Fishing")
-local crabcagesW = Window:CreateTab("Crab Cages")
+local main = Window:AddTab({Title = "Auto Fishing"})
+local crabcagesW = Window:AddTab({Title = "Crab Cages"})
 
 local autoFishToggle = createToggle(main, "Auto Fish Toggle", false, "Autofishing", function(value)
-    Rayfield:Notify{
+    Fluent:Notify{
         Title = "Autofishing",
         Content = `Autofishing set to {tostring(toggles.Autofishing)}`,
         Duration = 2
@@ -118,27 +132,29 @@ end)
 
 
 
-local autoFishkeybind = main:CreateKeybind({
-    Name = "Keybind",
-    CurrentKeybind = "F",
+local autoFishkeybind = main:AddKeybind("AutoFishKeybind",{
+    Title = "Keybind",
+    Mode = "Toggle",
+    Default = "F",
     HoldToInteract = false,
     Callback = function()
-        autoFishToggle:Set(not toggles.Autofishing)
+        Options["Auto Fish Toggle"]:SetValue(not toggles.Autofishing)
     end
 })
-main:CreateLabel("Configuration")
+main:AddParagraph({Title = "Configuration"})
 
 local instaCatchToggle = createToggle(main, "Instant Catch", false, "InstantCatch")
 local freezeToggle = createToggle(main, "Freeze While Fishing", false, "Freeze")
 
-main:CreateSlider({
-    Name = "Auto reel threshold",
-    Range = {0, 1},
-    Increment = 0.01,
-    Suffix = "Height",
-    CurrentValue = 0.97,
+main:AddSlider("Reel",{
+    Title = "Auto reel threshold",
+    Min = 0,
+    Max = 100,
+    Rounding = 0,
+    --Suffix = "Height",
+    Default = 97,
     Callback = function(Value)
-        thresshold = Value
+        thresshold = (Value / 100)
     end,
 })
 
@@ -265,7 +281,7 @@ if plr.Character:FindFirstChildOfClass("Tool") then
     childRemovedFunc(plr.Character:FindFirstChildOfClass("Tool"))
 end
 
-local shop = Window:CreateTab("Shop")
+local shop = Window:AddTab({Title = "Shop"})
 
 local items = {
     ["Crab Cage"] = {
@@ -399,14 +415,15 @@ function merlinBuy(purchase : string, amount : number)
     plr.Character.HumanoidRootPart.CFrame = original
 end
 
-shop:CreateLabel("Items")
+shop:AddParagraph({Title = "Items"})
 
 for name,index in pairs(items) do
 
-    shop:CreateInput({
-        Name = `{name} - {tostring(index.Price)}C$`,
-        PlaceholderText = "1",
-        RemoveTextAfterFocusLost = true,
+    shop:AddInput(name,{
+        Title = `{name} - {tostring(index.Price)}C$`,
+        Placeholder = "1",
+        Numeric = true,
+        Finished = true,
         Callback = function(txt)
             local amount = tonumber(txt) or 1
             purchaseItem(name, index.CFrame, amount)
@@ -414,10 +431,11 @@ for name,index in pairs(items) do
     })
 end
 
-shop:CreateInput({
-    Name = "Enchant Relic - 11,000C$",
-    PlaceholderText = "1",
-    RemoveTextAfterFocusLost = true,
+shop:AddInput("Relic",{
+    Title = "Enchant Relic - 11,000C$",
+    Placeholder = "1",
+    Numeric = true,
+    Finished = true,
     Callback = function(txt)
         local amount = tonumber(txt)
         if amount == nil then return end
@@ -425,14 +443,15 @@ shop:CreateInput({
     end
 })
 
-shop:CreateLabel("Totems")
+shop:AddParagraph({Title = "Totems"})
 
 for name,index in pairs(totems) do
 
-    shop:CreateInput({
-        Name = `{name} - {tostring(index.Price)}C$`,
-        PlaceholderText = "1",
-        RemoveTextAfterFocusLost = true,
+    shop:AddInput("name",{
+        Title = `{name} - {tostring(index.Price)}C$`,
+        Placeholder = "1",
+        Numeric = true,
+        Finished = true,
         Callback = function(txt)
             local amount = tonumber(txt) or 1
             purchaseItem(name, index.CFrame, amount)
@@ -440,11 +459,12 @@ for name,index in pairs(totems) do
     })
 end
 
-shop:CreateLabel("Modifiers")
-shop:CreateInput({
-    Name = "Luck VI - 5,000C$",
-    PlaceholderText = "1",
-    RemoveTextAfterFocusLost = true,
+shop:AddParagraph({Title = "Modifiers"})
+shop:AddInput("Luck",{
+    Title = "Luck VI - 5,000C$",
+    Placeholder = "1",
+    Numeric = true,
+    Finished = true,
     Callback = function(txt)
         local amount = tonumber(txt)
         if amount == nil then return end
@@ -456,8 +476,8 @@ shop:CreateInput({
 --crabcagesW:CreateLabel("Crab Cages")
 
 --#TODO fix the lag when placing to many
-crabcagesW:CreateButton({
-    Name = "Place All",
+crabcagesW:AddButton({
+    Title = "Place All",
     Callback = function()
 
         if plr.Character:FindFirstChild("Crab Cage") then
@@ -496,8 +516,8 @@ end)
 
 -- selene: allow(undefined_variable)
 if fireproximityprompt ~= nil then
-crabcagesW:CreateButton({
-    Name = "Collect All",
+crabcagesW:AddButton({
+    Title = "Collect All",
     Callback = function()
         for _,child in pairs(active:GetChildren()) do
             if child.Name == plr.Name then
@@ -515,11 +535,11 @@ crabcagesW:CreateButton({
 end
 
 
-local teleprots = Window:CreateTab("Misc")
+local teleprots = Window:AddTab({Title = "Misc"})
 
-teleprots:CreateToggle({
-    Name = "Drowning Enabled",
-    CurrentValue = true,
+teleprots:AddToggle("Drowning",{
+    Title = "Drowning Enabled",
+    Default = true,
     Callback = function(Value)
         plr.Character:FindFirstChild("client"):FindFirstChild("oxygen").Enabled = Value
     end
@@ -527,9 +547,9 @@ teleprots:CreateToggle({
 
 local pois = active:FindFirstChild("OceanPOI's")
 local zones : Model = workspace.zones.fishing
-teleprots:CreateToggle({
-    Name = "Click Island Text To TP",
-    CurrentValue = true,
+teleprots:AddToggle("ISLAND",{
+    Title = "Click Island Text To TP",
+    Default = true,
     Callback = function(Value)
         for i,v in pairs(plr.PlayerGui:GetChildren()) do
             if v:IsA("BillboardGui") then
@@ -617,12 +637,12 @@ zones.DescendantAdded:Connect(function(descendant)
     end
 end)
 
-teleprots:CreateLabel("Teleports")
+teleprots:AddParagraph({Title = "Teleports"})
 
 for i,v in pairs(teleports) do
     if typeof(v) == "CFrame" then
-        teleprots:CreateButton({
-            Name = i,
+        teleprots:AddButton({
+            Title = i,
             Callback = function()
                 plr.Character.HumanoidRootPart.CFrame = v
             end
@@ -635,15 +655,17 @@ for i,v in pairs(teleports) do
             table.insert(opss, i)
         end
         local drop = nil
-        drop = teleprots:CreateDropdown({
-            Name = i,
-            Options = opss,
-            CurrentOption = nil,
-            MultipleOptions = false,
-            Callback = function(Option)
-                plr.Character.HumanoidRootPart.CFrame = v[Option[1]]
-            end,
+        drop = teleprots:AddDropdown(i,{
+            Title = i,
+            Values = opss,
+            Default = nil,
+            Multi = false,
          })
+        drop:OnChanged(function(Value)
+            if Value ~= nil then
+                plr.Character.HumanoidRootPart.CFrame = v[Value]
+            end
+        end)
     end
 end
 
@@ -655,6 +677,8 @@ plr.ChildAdded:Connect(function(child)
         for i,v in pairs(toggles) do
             toggles[i] = false
         end
-        Rayfield:Destroy()
+        --Rayfield:Destroy()
     end
 end)
+
+Window:SelectTab(1)
