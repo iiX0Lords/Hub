@@ -61,7 +61,7 @@ local teleports = {
     ["The Depths"] = CFrame.new(947.5, -711.7, 1243.2),
 }
 
-local version = "<!#FV> 1.6.4 </#FV>"
+local version = "<!#FV> 1.6.5 </#FV>"
 version = string.sub(version,8,13)
 local Window = Fluent:CreateWindow({
     Title = `Fisching | {version}`,
@@ -515,24 +515,24 @@ active.ChildAdded:Connect(function(child)
 end)
 
 -- selene: allow(undefined_variable)
-if fireproximityprompt ~= nil then
-crabcagesW:AddButton({
-    Title = "Collect All",
-    Callback = function()
-        for _,child in pairs(active:GetChildren()) do
-            if child.Name == plr.Name then
-                if child:FindFirstChild("Cage") then
-                    local prompt = child:FindFirstChildOfClass("ProximityPrompt")
+-- if fireproximityprompt ~= nil then
+-- crabcagesW:AddButton({
+--     Title = "Collect All",
+--     Callback = function()
+--         for _,child in pairs(active:GetChildren()) do
+--             if child.Name == plr.Name then
+--                 if child:FindFirstChild("Cage") then
+--                     local prompt = child:FindFirstChildOfClass("ProximityPrompt")
                     
-                    plr.Character.HumanoidRootPart.CFrame = child.Cage.cage.CFrame
-                    fireproximityprompt(prompt)
+--                     plr.Character.HumanoidRootPart.CFrame = child.Cage.cage.CFrame
+--                     fireproximityprompt(prompt)
 
-                end
-            end
-        end
-    end
-})
-end
+--                 end
+--             end
+--         end
+--     end
+-- })
+-- end
 
 
 local teleprots = Window:AddTab({Title = "Misc"})
