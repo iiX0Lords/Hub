@@ -61,11 +61,11 @@ local teleports = {
     ["The Depths"] = CFrame.new(947.5, -711.7, 1243.2),
 }
 
-local version = "<!#FV> 1.6.3 </#FV>"
+local version = "<!#FV> 1.6.4 </#FV>"
 version = string.sub(version,8,13)
 local Window = Fluent:CreateWindow({
     Title = `Fisching | {version}`,
-    SubTitle = "by xlords",
+    SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = false,
