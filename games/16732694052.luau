@@ -58,9 +58,10 @@ local teleports = {
         ["Trident Temple"] = CFrame.new(-1477, -225, -2346),
     },
     ["Forsaken Shores"] = CFrame.new(-2498, 132, 1543),
+    ["The Depths"] = CFrame.new(947.5, -711.7, 1243.2),
 }
 
-local version = "<!#FV> 1.4.3 </#FV>"
+local version = "<!#FV> 1.5.3 </#FV>"
 version = string.sub(version,8,13)
 local Window = Rayfield:CreateWindow({
     Name = `Fisching | {version}`,
